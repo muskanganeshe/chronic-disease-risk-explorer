@@ -71,25 +71,25 @@ tab1, tab2, tab3 = st.tabs(["Disease patterns", "Risk factors", "Data preview"])
 with tab1:
     left, right = st.columns(2)
     prev = pd.DataFrame({"Condition": ["Heart disease", "Diabetes", "Stroke"], "Prevalence (%)": [df[c].mean()*100 for c in OUTCOMES]})
-    left.plotly_chart(px.bar(prev, x="Condition", y="Prevalence (%)", color="Condition", title="Condition prevalence in selected group", text_auto=".1f"), use_container_width=True)
+    left.plotly_chart(px.bar(prev, x="Condition", y="Prevalence (%)", color="Condition", title="Condition prevalence in selected group", text_auto=".1f"), width="stretch")
     ages = df.assign(AgeGroup=pd.cut(df.Age, [0, 29, 44, 59, 74, 120], labels=["18–29", "30–44", "45–59", "60–74", "75+"])).groupby("AgeGroup", observed=False)[OUTCOMES].mean().mul(100).reset_index().melt("AgeGroup", var_name="Condition", value_name="Prevalence (%)")
-    right.plotly_chart(px.line(ages, x="AgeGroup", y="Prevalence (%)", color="Condition", markers=True, title="Prevalence by age group"), use_container_width=True)
+    right.plotly_chart(px.line(ages, x="AgeGroup", y="Prevalence (%)", color="Condition", markers=True, title="Prevalence by age group"), width="stretch")
     bmi = df.assign(BMICategory=pd.cut(df.BMI, [-np.inf, 18.5, 25, 30, np.inf], labels=["Underweight", "Healthy", "Overweight", "Obesity"])).groupby("BMICategory", observed=False)[OUTCOMES].mean().mul(100).reset_index().melt("BMICategory", var_name="Condition", value_name="Prevalence (%)")
-    st.plotly_chart(px.bar(bmi, x="BMICategory", y="Prevalence (%)", color="Condition", barmode="group", title="Condition prevalence by BMI category"), use_container_width=True)
+    st.plotly_chart(px.bar(bmi, x="BMICategory", y="Prevalence (%)", color="Condition", barmode="group", title="Condition prevalence by BMI category"), width="stretch")
 with tab2:
     left, right = st.columns(2)
     life = df.groupby("ExerciseLevel", observed=False)[OUTCOMES].mean().mul(100).reset_index().melt("ExerciseLevel", var_name="Condition", value_name="Prevalence (%)")
-    left.plotly_chart(px.bar(life, x="ExerciseLevel", y="Prevalence (%)", color="Condition", barmode="group", title="Disease prevalence by exercise level"), use_container_width=True)
+    left.plotly_chart(px.bar(life, x="ExerciseLevel", y="Prevalence (%)", color="Condition", barmode="group", title="Disease prevalence by exercise level"), width="stretch")
     indicators = []
     for label, c in [("Smoking", "Smoking"), ("Alcohol use", "AlcoholUse"), ("Fatigue", "Fatigue"), ("Chest pain", "ChestPain"), ("Dizziness", "Dizziness")]:
         for outcome in OUTCOMES:
             group = df[df[c] == 1]
             indicators.append({"Indicator": label, "Condition": outcome, "Prevalence (%)": group[outcome].mean()*100 if len(group) else 0})
-    right.plotly_chart(px.bar(pd.DataFrame(indicators), x="Indicator", y="Prevalence (%)", color="Condition", barmode="group", title="Condition prevalence when indicator is reported"), use_container_width=True)
+    right.plotly_chart(px.bar(pd.DataFrame(indicators), x="Indicator", y="Prevalence (%)", color="Condition", barmode="group", title="Condition prevalence when indicator is reported"), width="stretch")
     corr = df[["Age", "BMI", "BloodPressure", "Cholesterol", "Glucose", "Smoking", "AlcoholUse", "Fatigue", "ChestPain", "Dizziness", *OUTCOMES]].corr(numeric_only=True)
-    st.plotly_chart(px.imshow(corr, text_auto=".2f", zmin=-1, zmax=1, color_continuous_scale="RdBu_r", title="Correlation matrix (association, not causation)"), use_container_width=True)
+    st.plotly_chart(px.imshow(corr, text_auto=".2f", zmin=-1, zmax=1, color_continuous_scale="RdBu_r", title="Correlation matrix (association, not causation)"), width="stretch")
 with tab3:
     st.caption("Showing at most 100 filtered records. Uploaded CSV values are not saved by this app.")
-    st.dataframe(df.head(100), use_container_width=True, hide_index=True)
+    st.dataframe(df.head(100), width="stretch", hide_index=True)
     st.download_button("Download filtered rows as CSV", df.to_csv(index=False).encode("utf-8"), "healthrisk_filtered.csv", "text/csv")
 st.caption("Group differences and correlations are descriptive. Synthetic demo relationships are simulated and are not medical evidence.")

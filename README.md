@@ -18,7 +18,7 @@ An interactive dashboard for exploring how demographic, clinical, lifestyle, and
 
 ## Run locally
 
-Requires Python 3.10 or newer.
+Requires Python 3.11 or newer (Python 3.12 recommended).
 
 ```powershell
 py -m venv .venv

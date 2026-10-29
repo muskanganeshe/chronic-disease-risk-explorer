@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-st.set_page_config(page_title="HealthRisk Analytics", page_icon="🩺", layout="wide")
+st.set_page_config(page_title="Chronic Disease Risk Explorer", page_icon="🩺", layout="wide")
 OUTCOMES = ["HeartDisease", "Diabetes", "Stroke"]
 REQUIRED = ["Age", "BMI", "BloodPressure", "Cholesterol", "Glucose", "Smoking", "AlcoholUse", "ExerciseLevel", "Fatigue", "ChestPain", "Dizziness", *OUTCOMES]
 
@@ -38,7 +38,7 @@ def clean_data(df):
     for c in nums: df[c] = pd.to_numeric(df[c].replace({"Yes": 1, "No": 0, "yes": 1, "no": 0, True: 1, False: 0}), errors="coerce")
     return df.dropna(subset=REQUIRED).copy(), []
 
-st.title("🩺 HealthRisk Analytics")
+st.title("🩺 Chronic Disease Risk Explorer")
 st.caption("Interactive exploration of chronic disease patterns and health indicators")
 st.warning("Educational demo only. Default records are synthetic and do not represent real patients. This dashboard does not diagnose, predict individual risk, or replace clinical judgment.")
 with st.sidebar:

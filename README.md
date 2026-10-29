@@ -1,4 +1,4 @@
-# HealthRisk Analytics
+# Chronic Disease Risk Explorer
 
 An interactive dashboard for exploring how demographic, clinical, lifestyle, and symptom indicators vary alongside heart disease, diabetes, and stroke outcomes.
 
@@ -48,18 +48,18 @@ Upload a CSV in the dashboard using these exact column names:
 
 ## Deploy online with Streamlit Community Cloud
 
-1. Create a **public GitHub repository** named `healthrisk-analytics` (or another available name). Do not initialize it with a README if you already have this local project.
+1. Create a **public GitHub repository** named `chronic-disease-risk-explorer` (or another available name). Do not initialize it with a README if you already have this local project.
 2. From this project folder, run the following in PowerShell, replacing `YOUR_GITHUB_USERNAME` with your account name:
 
    ```powershell
    git add .
-   git commit -m "Build HealthRisk Analytics dashboard"
+   git commit -m "Build Chronic Disease Risk Explorer dashboard"
    git branch -M main
-   git remote add origin https://github.com/YOUR_GITHUB_USERNAME/healthrisk-analytics.git
+   git remote add origin https://github.com/YOUR_GITHUB_USERNAME/chronic-disease-risk-explorer.git
    git push -u origin main
    ```
 
-   If `origin` already exists, use `git remote set-url origin https://github.com/YOUR_GITHUB_USERNAME/healthrisk-analytics.git` instead of `git remote add`.
+   If `origin` already exists, use `git remote set-url origin https://github.com/YOUR_GITHUB_USERNAME/chronic-disease-risk-explorer.git` instead of `git remote add`.
 3. Sign in at [share.streamlit.io](https://share.streamlit.io/) with GitHub and authorize access to the repository.
 4. Choose **Create app**, select the repository, branch `main`, and entrypoint `app.py`; then deploy.
 5. When deployment finishes, copy the generated `https://....streamlit.app` address into the **Live app** section above and submit that URL with the GitHub repository link.
@@ -69,7 +69,7 @@ The demo URL cannot be reserved or created before the app is deployed from your 
 ## Suggested repository contents
 
 ```text
-healthrisk-analytics/
+chronic-disease-risk-explorer/
 ├── app.py                 # dashboard
 ├── requirements.txt       # pinned Python dependencies
 ├── README.md              # project, data, setup, and deployment guide
@@ -79,7 +79,7 @@ healthrisk-analytics/
 
 ## Suggested project description for GitHub
 
-> Interactive Streamlit dashboard for exploring chronic disease prevalence and demographic, clinical, lifestyle, and symptom patterns using synthetic demonstration data.
+> Interactive dashboard for exploring chronic disease prevalence and demographic, clinical, lifestyle, and symptom patterns using synthetic demonstration data.
 
 ## Limitations and responsible use
 

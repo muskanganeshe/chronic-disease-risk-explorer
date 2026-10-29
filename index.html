@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chronic Disease Risk Explorer</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root { --navy:#102a43; --blue:#1f77b4; --bg:#f5f8fc; --card:#fff; --muted:#627d98; }
+    * { box-sizing:border-box } body { margin:0; font:15px Arial,sans-serif; background:var(--bg); color:var(--navy) }
+    header { padding:28px max(24px,calc((100% - 1180px)/2)); background:linear-gradient(120deg,#102a43,#1f77b4); color:white }
+    h1 { margin:0 0 7px; font-size:30px } header p { margin:0; opacity:.9 }
+    main { max-width:1180px; margin:24px auto; padding:0 20px } .notice { background:#fff3cd; border:1px solid #ffe69c; padding:12px 14px; border-radius:9px; color:#664d03 }
+    .filters,.kpis,.charts { display:grid; gap:16px; margin-top:20px } .filters { grid-template-columns:repeat(3,1fr) } .kpis { grid-template-columns:repeat(5,1fr) } .charts { grid-template-columns:repeat(2,1fr) }
+    .card { background:var(--card); border-radius:12px; box-shadow:0 2px 9px #102a4314; padding:18px } label { display:block; font-weight:700; margin-bottom:8px } select,input { width:100%; padding:10px; border:1px solid #bcccdc; border-radius:7px; background:white; color:var(--navy) }
+    .metric { font-size:28px; font-weight:700; color:var(--blue); margin-top:8px } .metric-label { color:var(--muted); font-size:13px } .chart { min-height:330px } footer { color:var(--muted); font-size:13px; padding:10px 0 28px }
+    @media(max-width:800px){.filters,.kpis,.charts{grid-template-columns:1fr 1fr}.kpis .card:last-child{grid-column:span 2}} @media(max-width:520px){.filters,.kpis,.charts{grid-template-columns:1fr}.kpis .card:last-child{grid-column:auto}}
+  </style>
+</head>
+<body>
+<header><h1>🩺 Chronic Disease Risk Explorer</h1><p>Interactive analysis of demographic, clinical, lifestyle, and symptom patterns</p></header>
+<main>
+  <div class="notice"><strong>Educational demo:</strong> this dashboard uses simulated synthetic records. It does not diagnose disease or replace clinical judgment.</div>
+  <section class="filters card">
+    <div><label for="age">Age range</label><select id="age"><option value="all">18–85 years</option><option value="young">18–44 years</option><option value="mid">45–59 years</option><option value="senior">60+ years</option></select></div>
+    <div><label for="bmi">BMI category</label><select id="bmi"><option value="all">All categories</option><option value="healthy">Healthy (18.5–24.9)</option><option value="over">Overweight (25–29.9)</option><option value="obesity">Obesity (≥30)</option></select></div>
+    <div><label for="exercise">Exercise level</label><select id="exercise"><option value="all">All levels</option><option value="Low">Low</option><option value="Moderate">Moderate</option><option value="High">High</option></select></div>
+  </section>
+  <section class="kpis">
+    <div class="card"><div class="metric-label">Patients</div><div class="metric" id="patients">2,400</div></div>
+    <div class="card"><div class="metric-label">Heart disease</div><div class="metric" id="heart">–</div></div>
+    <div class="card"><div class="metric-label">Diabetes</div><div class="metric" id="diabetes">–</div></div>
+    <div class="card"><div class="metric-label">Stroke</div><div class="metric" id="stroke">–</div></div>
+    <div class="card"><div class="metric-label">Mean BMI</div><div class="metric" id="meanBmi">–</div></div>
+  </section>
+  <section class="charts">
+    <div class="card"><div id="prevalence" class="chart"></div></div>
+    <div class="card"><div id="byAge" class="chart"></div></div>
+    <div class="card"><div id="byBmi" class="chart"></div></div>
+    <div class="card"><div id="lifestyle" class="chart"></div></div>
+  </section>
+  <footer>Results are descriptive simulated examples. Group differences and correlations do not establish cause and effect.</footer>
+</main>
+<script>
+  const rnd=seed=>{let x=Math.sin(seed)*10000;return x-Math.floor(x)};
+  const data=Array.from({length:2400},(_,i)=>{let r=n=>rnd(i*17+n),age=18+Math.floor(r(1)*68),bmi=Math.max(16,Math.min(45,22+r(2)*11+(age-45)*.025)),exercise=r(3)<.34?'Low':r(3)<.78?'Moderate':'High',smoke=r(4)<.20?1:0,bp=105+age*.48+(bmi-25)*.6+smoke*6+r(5)*22,glucose=78+age*.35+(bmi-25)*1.35+r(6)*30,diabetes=+(r(7)<Math.min(.72,.025+Math.max(0,age-35)*.006+Math.max(0,bmi-25)*.025+Math.max(0,glucose-105)*.004)),heart=+(r(8)<Math.min(.65,.015+Math.max(0,age-40)*.007+smoke*.08+diabetes*.10+Math.max(0,bp-125)*.004)),stroke=+(r(9)<Math.min(.42,.006+Math.max(0,age-45)*.004+diabetes*.06+Math.max(0,bp-130)*.004));return{age,bmi,exercise,smoke,bp,glucose,diabetes,heart,stroke}});
+  const pct=(a,k)=>a.length?(a.reduce((s,x)=>s+x[k],0)*100/a.length).toFixed(1):'0.0';
+  const mean=(a,k)=>a.length?(a.reduce((s,x)=>s+x[k],0)/a.length).toFixed(1):'0.0';
+  const layout=title=>({title:{text:title,font:{size:16}},margin:{t:48,l:45,r:15,b:45},paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{color:'#102a43'},showlegend:true,legend:{orientation:'h',y:-.2}});
+  function current(){let age=document.querySelector('#age').value,bmi=document.querySelector('#bmi').value,ex=document.querySelector('#exercise').value;return data.filter(x=>(age==='all'||age==='young'&&x.age<45||age==='mid'&&x.age>=45&&x.age<60||age==='senior'&&x.age>=60)&&(bmi==='all'||bmi==='healthy'&&x.bmi>=18.5&&x.bmi<25||bmi==='over'&&x.bmi>=25&&x.bmi<30||bmi==='obesity'&&x.bmi>=30)&&(ex==='all'||x.exercise===ex))}
+  function draw(){let d=current();document.querySelector('#patients').textContent=d.length.toLocaleString();document.querySelector('#heart').textContent=pct(d,'heart')+'%';document.querySelector('#diabetes').textContent=pct(d,'diabetes')+'%';document.querySelector('#stroke').textContent=pct(d,'stroke')+'%';document.querySelector('#meanBmi').textContent=mean(d,'bmi');
+    Plotly.react('prevalence',[{x:['Heart disease','Diabetes','Stroke'],y:[pct(d,'heart'),pct(d,'diabetes'),pct(d,'stroke')],type:'bar',marker:{color:['#e15759','#4e79a7','#59a14f']},text:[pct(d,'heart')+'%',pct(d,'diabetes')+'%',pct(d,'stroke')+'%'],textposition:'auto'}],{...layout('Condition prevalence'),yaxis:{title:'Prevalence (%)',rangemode:'tozero'}},{responsive:true,displayModeBar:false});
+    let groups=[['18–29',x=>x.age<30],['30–44',x=>x.age>=30&&x.age<45],['45–59',x=>x.age>=45&&x.age<60],['60–74',x=>x.age>=60&&x.age<75],['75+',x=>x.age>=75]]; let lines=[['Heart disease','heart','#e15759'],['Diabetes','diabetes','#4e79a7'],['Stroke','stroke','#59a14f']].map(([n,k,c])=>({x:groups.map(g=>g[0]),y:groups.map(g=>pct(d.filter(g[1]),k)),type:'scatter',mode:'lines+markers',name:n,line:{color:c}})); Plotly.react('byAge',lines,{...layout('Prevalence by age group'),yaxis:{title:'Prevalence (%)',rangemode:'tozero'}},{responsive:true,displayModeBar:false});
+    let cats=[['Healthy',x=>x.bmi>=18.5&&x.bmi<25],['Overweight',x=>x.bmi>=25&&x.bmi<30],['Obesity',x=>x.bmi>=30]];let bars=[['Heart disease','heart','#e15759'],['Diabetes','diabetes','#4e79a7'],['Stroke','stroke','#59a14f']].map(([n,k,c])=>({x:cats.map(g=>g[0]),y:cats.map(g=>pct(d.filter(g[1]),k)),type:'bar',name:n,marker:{color:c}}));Plotly.react('byBmi',bars,{...layout('Condition prevalence by BMI'),barmode:'group',yaxis:{title:'Prevalence (%)',rangemode:'tozero'}},{responsive:true,displayModeBar:false});
+    let levels=['Low','Moderate','High'];let life=[['Heart disease','heart','#e15759'],['Diabetes','diabetes','#4e79a7'],['Stroke','stroke','#59a14f']].map(([n,k,c])=>({x:levels,y:levels.map(l=>pct(d.filter(x=>x.exercise===l),k)),type:'bar',name:n,marker:{color:c}}));Plotly.react('lifestyle',life,{...layout('Disease prevalence by exercise level'),barmode:'group',yaxis:{title:'Prevalence (%)',rangemode:'tozero'}},{responsive:true,displayModeBar:false});}
+  document.querySelectorAll('select').forEach(x=>x.addEventListener('change',draw));draw();
+</script>
+</body>
+</html>
